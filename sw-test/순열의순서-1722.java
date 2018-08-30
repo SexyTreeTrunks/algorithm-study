@@ -8,6 +8,8 @@ import java.util.StringTokenizer;
 
 public class Main {
 	static long weight[] = new long[21];
+	static boolean bitmask[] = new boolean[21];
+
 	public static void main(String[] args) throws IOException {
 		BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 		BufferedWriter out = new BufferedWriter(new OutputStreamWriter(System.out));
@@ -17,15 +19,15 @@ public class Main {
 		StringTokenizer tokens = new StringTokenizer(in.readLine());
 		int prob_num = Integer.parseInt(tokens.nextToken());
 		if (prob_num == 1) {
-			int perm_num = Integer.parseInt(tokens.nextToken());
-			arr = getPermOfNum(perm_num);
+			long perm_num = Long.parseLong(tokens.nextToken());
+			getPermOfNum(perm_num, arr);
 			for (int i = 0; i < arr.length - 1; i++) {
 				System.out.print(arr[i] + " ");
 			}
 			System.out.println(arr[arr.length - 1]);
 		} else {
 			for (int i = 0; i < arr.length; i++)
-				arr[i] = i + 1;
+				arr[i] = Integer.parseInt(tokens.nextToken());
 			System.out.println(getNumOfPerm(arr));
 		}
 
@@ -33,19 +35,38 @@ public class Main {
 		out.close();
 	}
 
-	private static int getNumOfPerm(int[] arr) {
-		
+	private static long getNumOfPerm(int[] arr) {
+		long num = 0;
+		for (int i = 0; i < arr.length; i++) {
+			int value = 0;
+			for (int j = i + 1; j < arr.length; j++)
+				if (arr[i] > arr[j])
+					value++;
+			num += value * weight[(arr.length - 1) - i];
+		}
+		return num + 1;
 	}
 
-	private static int[] getPermOfNum(int perm_num) {
-		
-	}
-	
-	private static void initWeight() {
-		weight[1] = 1;
-		for (int i = 2; i < weight.length; i++) {
-			weight[i] = i*weight[i-1];
+	private static void getPermOfNum(long perm_num, int[] arr) {
+		for (int i = 0; i < arr.length; i++) {
+			for (int j = 1; j <= arr.length; j++) {
+				if(bitmask[j]==true)
+					continue;
+				if(weight[arr.length -1 - i] < perm_num)
+					perm_num -= weight[arr.length -1 - i];
+				else {
+					arr[i] = j;
+					bitmask[j] = true;
+					break;
+				}
+			}
 		}
-		System.out.println(Arrays.toString(weight));
+	}
+
+	private static void initWeight() {
+		weight[0] = weight[1] = 1;
+		for (int i = 2; i < weight.length; i++) {
+			weight[i] = i * weight[i - 1];
+		}
 	}
 }
